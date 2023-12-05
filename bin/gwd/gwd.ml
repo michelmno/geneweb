@@ -2081,6 +2081,7 @@ let main () =
 #endif
   arg_parse_in_file (chop_extension Sys.argv.(0) ^ ".arg") speclist anonfun usage;
   Arg.parse speclist anonfun usage;
+  Secure.add_assets (Filename.dirname Sys.argv.(0));
   Geneweb.GWPARAM.syslog := GwdLog.syslog;
   let gwd_cmd =
     Array.fold_left (fun acc arg ->

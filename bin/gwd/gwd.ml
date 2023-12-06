@@ -1818,7 +1818,7 @@ let geneweb_server () =
             !selected_port !selected_port hostn !selected_port;
           Printf.eprintf "where \"base\" is the name of the database\n\
                    Type “Ctrl+C” to stop the service\n";
-          if !debug then ( (* taken from Michel Normand commit 1874dcbf7 *)
+          if !debug then (
           Printf.eprintf "gwd parameters (after GWPARAM.init & cache_lexicon):\n";
           Printf.eprintf "  source: %s\n" Version.src;
           Printf.eprintf "  branch: %s\n" Version.branch;
@@ -1831,7 +1831,7 @@ let geneweb_server () =
           Printf.eprintf "  images_dir: %s\n" !images_dir;
           List.iter
             (fun a -> Printf.eprintf "  secure asset: %s\n" a) (Secure.assets ());
-          Printf.eprintf "TODO: how to print content of conf ?\n";)
+          Printf.eprintf "  secure base_dir: %s\n" (Secure.base_dir ());)
         end;
       flush stderr;
       if !daemon then

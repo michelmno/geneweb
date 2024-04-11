@@ -988,6 +988,7 @@ let print_no_relationship conf base pl =
   Hutil.trailer conf
 
 let print_multi_relation conf base pl lim assoc_txt =
+  Printf.eprintf "print_multi_relation, entry point (%d)\n" lim;
   let assoc_txt : (Gwdb.iper, string) Hashtbl.t = assoc_txt in
   let pl1, pl2 =
     if lim <= 0 then (pl, [])
@@ -1003,6 +1004,7 @@ let print_multi_relation conf base pl lim assoc_txt =
       in
       loop lim [] pl
   in
+  Printf.eprintf "print_multi_relation, pl1, pl2 ok\n";
   let path =
     let rec loop path = function
       | p1 :: (p2 :: _ as pl) -> (
@@ -1024,6 +1026,7 @@ let print_multi_relation conf base pl lim assoc_txt =
     in
     loop [] pl1
   in
+  Printf.eprintf "print_multi_relation, path ok (%d)\n" (List.length path);
   if path = [] then print_no_relationship conf base pl
   else
     let elem_txt p =
@@ -1038,6 +1041,7 @@ let print_multi_relation conf base pl lim assoc_txt =
     in
     let vbar_txt _ = Adef.escaped "" in
     let next_txt = multi_relation_next_txt conf pl2 lim assoc_txt in
+    Printf.eprintf "print_multi_relation, exit point\n";
     print_relationship_dag conf base elem_txt vbar_txt path next_txt
 
 let print_base_loop conf base p =
@@ -1090,4 +1094,5 @@ let print_multi conf base =
     loop [] 1
   in
   let lim = Option.value ~default:0 (p_getint conf.env "lim") in
+  Printf.eprintf "print_multi, exit point\n";
   print_multi_relation conf base pl lim assoc_txt

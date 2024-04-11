@@ -109,6 +109,7 @@ let add_missing_parents_of_siblings conf base indl =
     indl []
 
 let dag_fam_list_of_ind_list indl =
+  Printf.eprintf "dag_fam_list_of_ind_list, entry point\n";
   List.fold_left
     (fun faml ind ->
       let faml =

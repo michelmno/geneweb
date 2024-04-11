@@ -1073,10 +1073,12 @@ let print conf base p = function
   | None -> relmenu_print conf base p
 
 let print_multi conf base =
+  Printf.eprintf "print_multi, entry point\n";
   let assoc_txt : (Gwdb.iper, string) Hashtbl.t = Hashtbl.create 53 in
   let pl =
     let rec loop pl i =
       let k = string_of_int i in
+      Printf.eprintf "print_multi, k = %s\n" k;
       match find_person_in_env conf base k with
       | Some p ->
           (match p_getenv conf.env ("t" ^ k) with

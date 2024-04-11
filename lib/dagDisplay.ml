@@ -1307,6 +1307,7 @@ let old_print_slices_menu_or_dag_page conf page_title hts next_txt =
   else print_dag_page conf page_title hts next_txt
 
 let print_slices_menu_or_dag_page conf base page_title hts next_txt =
+  Printf.eprintf "print_slices_menu_or_dag_page, entry point\n";
   if p_getenv conf.env "old" = Some "on" then
     old_print_slices_menu_or_dag_page conf page_title hts next_txt
   else
@@ -1359,9 +1360,11 @@ let print_slices_menu_or_dag_page conf base page_title hts next_txt =
       env ()
 
 let make_and_print_dag conf base elem_txt vbar_txt invert set spl page_title
+  Printf.eprintf "make_and_print_dag, entry point\n";
     next_txt =
   let d = make_dag conf base set in
   let hts = make_tree_hts conf base elem_txt vbar_txt invert set spl d in
+  Printf.eprintf "make_and_print_dag, exit point\n";
   print_slices_menu_or_dag_page conf base page_title hts next_txt
 
 let print conf base =

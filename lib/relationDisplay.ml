@@ -44,6 +44,7 @@ let dag_of_relation_path conf base path =
   (set, d)
 
 let old_print_relationship_dag conf base elem_txt vbar_txt path next_txt =
+  Printf.eprintf "old_print_relationship_dag, entry point\n";
   let invert = Util.p_getenv conf.env "invert" = Some "on" in
   let set, d = dag_of_relation_path conf base path in
   let page_title =
@@ -52,9 +53,11 @@ let old_print_relationship_dag conf base elem_txt vbar_txt path next_txt =
   let hts =
     DagDisplay.make_tree_hts conf base elem_txt vbar_txt invert set [] d
   in
+  Printf.eprintf "old_print_relationship_dag, exit point\n";
   DagDisplay.print_slices_menu_or_dag_page conf base page_title hts next_txt
 
 let print_relationship_dag conf base elem_txt vbar_txt path next_txt =
+  Printf.eprintf "print_relationship_dag, entry point\n";
   if p_getenv conf.env "new" <> Some "on" then
     old_print_relationship_dag conf base elem_txt vbar_txt path next_txt
   else
@@ -63,6 +66,7 @@ let print_relationship_dag conf base elem_txt vbar_txt path next_txt =
     let page_title =
       transl conf "relationship" |> Utf8.capitalize_fst |> Adef.safe
     in
+    Printf.eprintf "print_relationship_dag, exit point\n";
     DagDisplay.make_and_print_dag conf base elem_txt vbar_txt invert set []
       page_title next_txt
 

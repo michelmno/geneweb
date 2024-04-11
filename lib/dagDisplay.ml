@@ -1360,8 +1360,8 @@ let print_slices_menu_or_dag_page conf base page_title hts next_txt =
       env ()
 
 let make_and_print_dag conf base elem_txt vbar_txt invert set spl page_title
-  Printf.eprintf "make_and_print_dag, entry point\n";
     next_txt =
+  Printf.eprintf "make_and_print_dag, entry point\n";
   let d = make_dag conf base set in
   let hts = make_tree_hts conf base elem_txt vbar_txt invert set spl d in
   Printf.eprintf "make_and_print_dag, exit point\n";

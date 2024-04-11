@@ -27,11 +27,17 @@ let dag_of_ind_dag_list indl =
     indl
 
 let dag_of_relation_path conf base path =
+  Printf.eprintf "dag_of_relation_path, entry point\n";
   let indl = dag_ind_list_of_path path in
+  Printf.eprintf "dag_of_relation_path, after dag_ind_list_of_path\n";
   let indl = add_missing_parents_of_siblings conf base indl in
+  Printf.eprintf "dag_of_relation_path, after add_missing_parents_of_siblings\n";
   let faml = dag_fam_list_of_ind_list indl in
+  Printf.eprintf "dag_of_relation_path, after dag_fam_list_of_ind_list\n";
   let indl = add_phony_children indl faml in
+  Printf.eprintf "dag_of_relation_path, after add_phony_children\n";
   let nl = dag_of_ind_dag_list indl in
+  Printf.eprintf "dag_of_relation_path, after dag_of_ind_dag_list\n";
   let d = { dag = Array.of_list (List.rev nl) } in
   let set =
     List.fold_left
@@ -41,6 +47,7 @@ let dag_of_relation_path conf base path =
         | Def.Right _ -> set)
       Dag.Pset.empty nl
   in
+  Printf.eprintf "dag_of_relation_path, exit point\n";
   (set, d)
 
 let old_print_relationship_dag conf base elem_txt vbar_txt path next_txt =

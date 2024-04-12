@@ -109,10 +109,11 @@ let add_missing_parents_of_siblings conf base indl =
     indl []
 
 let dag_fam_list_of_ind_list indl =
-  Printf.eprintf "dag_fam_list_of_ind_list, entry point\n";
+  Printf.eprintf "dag_fam_list_of_ind_list, entry point, indl length (%d)\n" (List.length indl);
   List.fold_left
     (fun faml ind ->
       let faml =
+        Printf.eprintf "dag_fam_list_of_ind_list, in fun(faml ind), faml length (%d)\n" (List.length faml);
         if List.mem ind.di_famc faml then faml else ind.di_famc :: faml
       in
       if List.mem ind.di_fams faml then faml else ind.di_fams :: faml)

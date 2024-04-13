@@ -11,6 +11,20 @@ let round_2_dec x = floor ((x *. 100.0) +. 0.5) /. 100.0
  *)
 type famlink = Self | Parent | Sibling | HalfSibling | Mate | Child
 
+(* TODO: need to understand meaning of each lines:
+ * the single quote in 'a
+ * a by itself
+ * dag  in dag_ind
+ *       I assume dag same meaning in dag_fam (?)
+ * ind  in dag_ind
+ * di   in di_val , assuming val means value (?)
+ *       I assume di has same meaning in di_famc & di_fams (?)
+ * famc in di_famc
+ * fams in di_fams
+ * 
+ * df in df_pare
+ *       I assume df has same meaning in df_chil (?)
+ *)
 type 'a dag_ind = {
   di_val : 'a;
   mutable di_famc : 'a dag_fam;

@@ -4,13 +4,8 @@ on:
   # Allow manual runs.
   workflow_dispatch:
   push:
-    branches:
-      - master
-    paths-ignore:
-      - '**/*.md'
-  pull_request:
-    paths-ignore:
-      - '**/*.md'
+    tags:
+      - docker_gw*
 
 env:
   PLATFORMS: linux/arm64/v8,linux/amd64

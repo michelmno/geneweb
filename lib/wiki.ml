@@ -190,8 +190,7 @@ let syntax_links conf wi s =
       | NotesLinks.WLperson (j, (fn, sn, oc), name, _text) ->
           let exists, fn0, sn0 = wi.wi_person_exists (fn, sn, oc) in
           let name =
-            if name = (Name.lower fn0) ^ " " ^(Name.lower sn0)
-            then fn0 ^ " " ^ sn0
+            if name = Name.lower fn0 ^ " " ^ Name.lower sn0 then fn0 ^ " " ^ sn0
             else name
           in
           let t =

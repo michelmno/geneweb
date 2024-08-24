@@ -2019,7 +2019,7 @@ let find_person_in_env_pref conf base pref =
 let person_exists conf base (fn, sn, oc) =
   let auth, fn, sn =
     match person_of_key base fn sn oc with
-    | Some ip -> 
+    | Some ip ->
         if authorized_age conf base (pget conf base ip) then
           let p = poi base ip in
           (true, sou base (get_first_name p), sou base (get_surname p))

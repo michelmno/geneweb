@@ -5,7 +5,7 @@ open Util
 open UpdateData
 
 let translate_title conf len =
-  let plural = if len = 0 || len > 1 then 1 else 0 in
+  let plural = if len > 1 then 1 else 0 in
   let book_name =
     match p_getenv conf.env "data" with
     | Some "occu" -> transl_nth conf "occupation/occupations" plural

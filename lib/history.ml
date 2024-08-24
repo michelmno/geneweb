@@ -8,12 +8,7 @@ open TemplAst
 open Util
 
 (* S: Fail if conf.bname is undefined? *)
-let file_name conf =
-  let bname =
-    if Filename.check_suffix conf.bname ".gwb" then conf.bname
-    else conf.bname ^ ".gwb"
-  in
-  Filename.concat (Util.bpath bname) "history"
+let file_name conf = Filename.concat (Util.bpath conf.bname) "history"
 
 (* Record history when committing updates *)
 
@@ -239,7 +234,8 @@ let gen_record conf base changed action =
         | U_Kill_ancestors p
         | U_Change_children_name (p, _)
         | U_Multi (_, p, _) ->
-            p.first_name ^ "." ^ string_of_int p.occ ^ " " ^ p.surname
+            "(" ^ p.first_name ^ "." ^ string_of_int p.occ ^ " " ^ p.surname
+            ^ ")"
         | U_Notes (Some num, file) ->
             let s = string_of_int num in
             if file = "" then s else file ^ "/" ^ s

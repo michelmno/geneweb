@@ -237,9 +237,11 @@ let url_set_aux conf evar_l str_l =
     | s :: _l -> s
   in
   let conf_l = conf.henv @ conf.senv @ conf.env in
-  let k_l = List.map (fun (k, _v) -> k) conf_l in
-  let k_l = List.sort_uniq compare k_l in
-  let conf_l = List.map (fun k -> (k, List.assoc k conf_l)) k_l |> List.rev in
+  let conf_l =
+    List.fold_left
+      (fun acc (k, v) -> if List.mem_assoc k acc then acc else (k, v) :: acc)
+      [] conf_l
+  in
   (* process evar_l *)
   let url_env =
     let rec loop i acc evar_l =
@@ -278,6 +280,7 @@ let substr_start_aux n s =
   loop 0 n ""
 
 let rec eval_variable conf = function
+  | [ "base"; "name" ] -> conf.bname
   | [ "lang"; "full" ] ->
       let rec func x lst c =
         match lst with
@@ -306,7 +309,7 @@ let rec eval_variable conf = function
           acc
           ^ Format.sprintf "<b%s>%s</b>=%s<br>\n" duplicate k
               (Util.escape_html v :> string))
-        "" l
+        "" conf.base_env
   | [ "gwd"; "arglist" ] -> !GWPARAM.gwd_cmd
   | [ "bvar"; v ] | [ "b"; v ] -> (
       try List.assoc v conf.base_env with Not_found -> "")
@@ -352,7 +355,6 @@ let rec eval_variable conf = function
         | "p1" -> [ "i1"; "p1"; "n1"; "oc1" ]
         | "p2" -> [ "i2"; "p2"; "n2"; "oc2" ]
         | "pn" -> [ "i1"; "i2"; "p1"; "p2"; "n1"; "n2"; "oc1"; "oc2" ]
-        | "all" -> [ "templ"; "p_mod"; "wide" ]
         | _ -> [ pl ]
       in
       (Util.commd ~excl:pl_l conf :> string)
@@ -1100,6 +1102,7 @@ let rgb_of_str_hsv h s v =
 let eval_var conf ifun env ep loc sl =
   try
     match sl with
+    | [ "reorg" ] -> VVbool !GWPARAM.reorg
     | [ "env"; "key" ] -> (
         match ifun.get_vother (List.assoc "binding" env) with
         | Some (Vbind (k, _)) -> VVstring k
@@ -1134,7 +1137,7 @@ let print_foreach conf ifun print_ast eval_expr env ep loc s sl el al =
     templ_print_foreach conf print_ast ifun.set_vother env ep loc s sl el al
 
 let print_wid_hei conf fname =
-  match Image.size_from_path (Image.path_of_filename fname) with
+  match Image.size_from_path (Image.path_of_filename conf fname) with
   | Ok (wid, hei) -> Output.printf conf " width=\"%d\" height=\"%d\"" wid hei
   | Error () -> ()
 

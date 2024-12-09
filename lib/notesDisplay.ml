@@ -350,8 +350,7 @@ let print_mod conf base =
   let typ = try List.assoc "TYPE" env with Not_found -> "" in
   let templ =
     if typ = "" then None
-    else if typ = "gallery" then
-      Util.open_etc_file conf ("notes_upd_" ^ typ)
+    else if typ = "gallery" then Util.open_etc_file conf ("notes_upd_" ^ typ)
     else None
   in
   let title _ =

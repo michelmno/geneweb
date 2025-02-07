@@ -38,13 +38,13 @@
   <br>
   %if;(e_im=1)
     %if;xxx.has_image;
-      %if;not cancel_links;
+      %if;(not cancel_links or force_img_url)
         <a href="%xxx.image_url;" class="normal_anchor" %nn;
           target="_blank" title="[*image/images]0 %xxx;">%nn;
       %end;
         <img class="small_image %if;not cancel_links;fade_image%end; align-self-center rounded ml-0 pr-0" %nn;
           src="%xxx.image_url;" alt="[image/images]0">%nn;
-      %if;not cancel_links;</a>%end;
+      %if;(not cancel_links or force_img_url)</a>%end;
     %elseif;(bvar.default_image="yes")
       %if;(wizard and not cancel_links)
         <a href="%prefix;m=SND_IMAGE;i=%xxx.index;" %nn;

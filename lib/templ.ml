@@ -662,6 +662,8 @@ let templ_eval_var (conf : Config.config) = function
   | [ "cgi" ] -> VVbool conf.cgi
   | [ "debug" ] -> VVbool conf.debug
   | [ "false" ] -> VVbool false
+  | [ "force_img_url" ] ->
+      VVbool (Util.p_getenv conf.env "force_img_url" = Some "on")
   | [ "has_referer" ] ->
       (* deprecated since version 5.00 *)
       VVbool (Mutil.extract_param "referer: " '\n' conf.request <> "")

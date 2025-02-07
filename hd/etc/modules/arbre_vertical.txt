@@ -32,13 +32,13 @@
                 alt="[blason]0 " title="[blason]0">%nn;
               %if;not cancel_links;</a>%end;
             %end;
-            %if;not cancel_links;<a
+            %if;(not cancel_links or force_img_url);<a
               href="%if;cell.person.has_image;%cell.person.image_url;%else;%cell.person.blason_url;%end;">%end;
             <img class="rounded mb-1"
               src="%if;cell.person.has_image;%cell.person.image_url;%else;%cell.person.blason_url;%end;"%nn;
               %if;cell.person.has_image;%cell.person.image_small_size;%else;%cell.person.blason_small_size;%end;%sp;%nn;
               alt="[image/images]0 " title="[image/images]0">%nn;
-            %if;not cancel_links;</a>%end;<br>
+            %if;(not cancel_links or force_img_url)</a>%end;<br>
           %end;
           %( Checking if the ancestors are falsly alive by verifying three first generations (self/parents/grand-parents births)
              + also cell.person birth and death + his cell.family.marriage + cell.family.”parents” infos too
@@ -241,10 +241,10 @@
     %if;not cancel_links;</a>%end;
     %if;(xx.has_image and e.im!=0)
       <div>
-        %if;not cancel_links;<a href="%xx.image_html_url;">%end;
+        %if;(not cancel_links or force_img_url)<a href="%xx.image_html_url">%end;
         <img class="rounded" src="%xx.image_url;"%xx.image_small_size;
           alt="[image/images]0 %xx;" title="[image/images]0">%nn;
-        %if;not cancel_links;</a>%end;
+        %if;(not cancel_links or force_img_url)</a>%end;
       </div>
     %end;
     %if;(xx!=self)<div>|</div>%end;

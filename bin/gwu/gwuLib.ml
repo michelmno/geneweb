@@ -644,8 +644,7 @@ let print_pevent opts base gen e =
         print_witness opts base gen p;
         Printf.ksprintf (oc opts) "\n"))
     e.epers_witnesses;
-  let note =
-    if opts.no_notes <> `nnn then Driver.sou base e.epers_note else ""
+  let note = if opts.notes then Driver.sou base e.epers_note else ""
   in
   if note <> "" then
     List.iter
@@ -743,9 +742,7 @@ let print_fevent opts base gen in_comment e =
         print_witness opts base gen p;
         print_sep ()))
     e.efam_witnesses;
-  let note =
-    if opts.no_notes <> `nnn then Driver.sou base e.efam_note else ""
-  in
+  let note = if opts.notes then Driver.sou base e.efam_note else "" in
   if note <> "" then
     List.iter
       (fun line ->
@@ -755,8 +752,7 @@ let print_fevent opts base gen in_comment e =
 
 let print_comment_for_family opts base gen fam =
   let comm =
-    if opts.no_notes <> `nnn then Driver.sou base (Driver.get_comment fam)
-    else ""
+    if opts.notes then Driver.sou base (Driver.get_comment fam) else ""
   in
   (* Si on est en mode old_gw, on mets tous les évènements dans les notes. *)
   (* On supprime les 2 évènements principaux. *)
@@ -993,9 +989,7 @@ let print_notes_for_person opts base gen p =
     | Epers_Cremation -> "cremation"
     | _ -> ""
   in
-  let notes =
-    if opts.no_notes <> `nnn then Driver.sou base (Driver.get_notes p) else ""
-  in
+  let notes = if opts.notes then Driver.sou base (Driver.get_notes p) else "" in
   let surn = s_correct_string (Driver.p_surname base p) in
   let fnam = s_correct_string (Driver.p_first_name base p) in
   (* Si on n'est en mode old_gw, on mets tous les évènements dans les notes. *)
@@ -1016,8 +1010,7 @@ let print_notes_for_person opts base gen p =
              | Epers_Cremation ->
                  let name = epers_name_to_string evt in
                  let notes =
-                   if opts.no_notes <> `nnn then Driver.sou base evt.epers_note
-                   else ""
+                   if opts.notes then Driver.sou base evt.epers_note else ""
                  in
                  if notes <> "" then
                    Printf.ksprintf (oc opts) "%s: %s\n" name notes;
@@ -1037,7 +1030,7 @@ let print_notes_for_person opts base gen p =
   let s =
     let aux g = Driver.sou base (g p) in
     let sl =
-      if opts.no_notes <> `nnn then
+      if opts.notes then
         [
           aux Driver.get_notes;
           aux Driver.get_birth_note;
@@ -1060,8 +1053,7 @@ let print_notes_for_person opts base gen p =
       List.fold_left
         (fun acc e ->
           let acc =
-            if opts.no_notes <> `nnn then Driver.sou base e.epers_note :: acc
-            else acc
+            if opts.notes then Driver.sou base e.epers_note :: acc else acc
           in
           let acc =
             if opts.source = None then Driver.sou base e.epers_src :: acc
@@ -1761,7 +1753,7 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
                 print_isolated_relations opts base gen p)
       (Geneweb_db.Driver.ipers base);
   if !Mutil.verbose then ProgrBar.finish ();
-  if opts.no_notes = `none then (
+  if opts.base_notes then (
     let s = Driver.base_notes_read base "" in
     let oc, first, _ = origin_file (Driver.base_notes_origin_file base) in
     let f, _ooc, c = opts.oc in

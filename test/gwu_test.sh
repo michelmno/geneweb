@@ -42,7 +42,7 @@ GWCOPT='-v -f -cg'
 #===  main ====================
 cmd=$(basename $0)
 cmddir=$(dirname $0)
-echo "starting $0 $@"
+echo "$0 $@ started"
 while getopts "df:hr" Option
 do
 case $Option in
@@ -98,7 +98,7 @@ gwcopt="$GWCOPT -bd $BASES_DIR $optreorg"
 test -n "$debug" && set -x
 $SUDOPRFX $BIN_DIR/gwc $gwcopt -o $DBNAME $BASES_DIR/$DBNAME.gw >$BASES_DIR/$DBNAME.log 2>&1 || \
   { echo "gwc failure, details in $BASES_DIR/$DBNAME.log"; exit 1; }
-
+test -n "$debug" && cat $BASES_DIR/$DBNAME.log
 
 if test "$DBNAME" = "$REFDBNAME"; then
     tmpdir="$BASES_DIR/unzip_tmp"
@@ -121,8 +121,10 @@ fi
 
 $SUDOPRFX $BIN_DIR/gwu $BASES_DIR/$DBNAME -v -o $BASES_DIR/${DBNAME}.gwu.o.gw 2>$BASES_DIR/$DBNAME.gwu.o.stderr || \
   { echo "gwu failure, details in $BASES_DIR/$DBNAME.gwu.o.stderr"; exit 1; }
+test -n "$debug" && cat $BASES_DIR/$DBNAME.gwu.o.stderr
 $SUDOPRFX $BIN_DIR/gwu $BASES_DIR/$DBNAME -v -o $BASES_DIR/${DBNAME}_nouveau.gw -odir $BASES_DIR/outdir.$DBNAME 2>$BASES_DIR/$DBNAME.gwu_stderr || \
   { echo "gwu failure, details in $BASES_DIR/$DBNAME.gwu_stderr"; exit 1; }
+test -n "$debug" && cat $BASES_DIR/$DBNAME.gwu_stderr
 
 RC=0
 for xx in "${DBNAME}.gwu.o.gw" "outdir.$DBNAME/$DBNAME.gw" ; do

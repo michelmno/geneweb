@@ -15,6 +15,7 @@ By default:
 If needed use -f option to change from default.
 
 Options:
+-d  print out some debug traces
 -f  file to be sourced in to overwrite hardcoded vars
 -h  To display this help.
 -r  To pass -reorg option to gwc
@@ -42,9 +43,10 @@ GWCOPT='-v -f -cg'
 cmd=$(basename $0)
 cmddir=$(dirname $0)
 echo "starting $0 $@"
-while getopts "f:hr" Option
+while getopts "df:hr" Option
 do
 case $Option in
+    d ) debug=1;;
     f ) setenv_file=$OPTARG
         test -f "$setenv_file" || \
             { echo "invalid -f $setenv_file  option file"; exit 1; }
@@ -93,6 +95,7 @@ for xx in .gwb _outdir; do
 done
 
 gwcopt="$GWCOPT -bd $BASES_DIR $optreorg"
+test -n "$debug" && set -x
 $SUDOPRFX $BIN_DIR/gwc $gwcopt -o $DBNAME $BASES_DIR/$DBNAME.gw >$BASES_DIR/$DBNAME.log 2>&1 || \
   { echo "gwc failure, details in $BASES_DIR/$DBNAME.log"; exit 1; }
 
@@ -135,8 +138,8 @@ for xx in "${DBNAME}.gwu.o.gw" "outdir.$DBNAME/$DBNAME.gw" ; do
 done
 
 if test "$RC" != 0; then
-    echo "at least $RC detected error(s)."
+    echo "$0 failed, at least $RC detected error(s)."
     exit 1
 else
-    echo "No detected error."
+    echo "$0 completed, No detected error."
 fi

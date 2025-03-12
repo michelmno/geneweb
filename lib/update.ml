@@ -170,8 +170,7 @@ let print_person_parents_and_spouses conf base p =
   let pub_name = sou base (get_public_name p) in
   if pub_name <> "" then
     Output.print_sstring conf (Printf.sprintf "%s" pub_name)
-  else
-    Output.print_string conf (escape_html @@ p_first_name base p);
+  else Output.print_string conf (escape_html @@ p_first_name base p);
   Output.print_sstring conf " ";
   Output.print_string conf (escape_html @@ p_surname base p);
   Output.print_sstring conf "</a>";

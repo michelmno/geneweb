@@ -124,12 +124,8 @@ module Legacy = struct
 
   let config_d _bname = Secure.base_dir ()
 
-  let lang_d bname lang =
-    let bname = Filename.remove_extension bname in
-    if lang = "" then
-      String.concat Filename.dir_sep [ Secure.base_dir (); "lang"; bname ]
-    else
-      String.concat Filename.dir_sep [ Secure.base_dir (); "lang"; lang; bname ]
+  let lang_d _bname _lang =
+    String.concat Filename.dir_sep [ Secure.base_dir (); "lang" ]
 
   let images_d bname =
     let bname = Filename.remove_extension bname in
@@ -588,26 +584,21 @@ let init_etc bname =
         !syslog `LOG_WARNING
           (Printf.sprintf "Failure when creating cnt_dir: %s" (!cnt_d bname)))
   else (
-    (if not (Sys.file_exists "etc") then
+    (if not (Sys.file_exists (!lang_d bname "")) then
      try
-       Unix.mkdir "etc" 0o755;
+       Unix.mkdir (!lang_d bname "") 0o755;
        force := true
      with Unix.Unix_error (_, _, _) ->
-       !syslog `LOG_WARNING (Printf.sprintf "Failure when creating etc"));
+       !syslog `LOG_WARNING
+         (Printf.sprintf "Failure when creating lang_dir: %s" (!lang_d bname "")));
 
-    (if not (Sys.file_exists "lang") then
+    (if not (Sys.file_exists (!cnt_d bname)) then
      try
-       Unix.mkdir "lang" 0o755;
+       Unix.mkdir (!cnt_d bname) 0o755;
        force := true
      with Unix.Unix_error (_, _, _) ->
-       !syslog `LOG_WARNING (Printf.sprintf "Failure when creating lang"));
-
-    (if not (Sys.file_exists "cnt") then
-     try
-       Unix.mkdir "cnt" 0o755;
-       force := true
-     with Unix.Unix_error (_, _, _) ->
-       !syslog `LOG_WARNING (Printf.sprintf "Failure when creating cnt"));
+       !syslog `LOG_WARNING
+         (Printf.sprintf "Failure when creating cnt_dir: %s" (!cnt_d bname)));
 
     if not (Sys.file_exists (!etc_d bname)) then
       try

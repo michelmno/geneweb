@@ -1,33 +1,48 @@
 #!/bin/sh
-#set -ex
+set -e
 usage()
 {
 echo "Usage: $cmd [Options]
 Compare gwc input and gwu output expecting no changes.
-Need to properly set 'hardcoded vars' in script header.
+By default:
+* assume we are running as test/$cmd
+  in the repo folder where geneweb was built
+  to access gwc/gwu tools in $BIN_DIR
+* gwc is using test/$REFDBNAME.gw input file and creating
+  $BASES_DIR/$REFDBNAME.gwb database.
+* if using $REFDBNAME then unzip related images to prepare DB
+  for usage by test/run_gw_test.sh other tool.
+If needed use -f option to change from default.
+
 Options:
 -f  file to be sourced in to overwrite hardcoded vars
 -h  To display this help.
+-r  To pass -reorg option to gwc
+    (if not set then gwc will create a legacy DB)
 "
 exit 1
 }
 
 setenv_file="./test-gw-vars.txt"
 
-REFTESTGW='galichet' # reference gw file
+REFDBNAME='galichet' # reference gw file
 #=== hardcoded vars (start) ===
 # assumes we are running in the repo folder
 # ./test/testgwu.sh
-TESTGW='galichet' # name of gw file input to gwc (w/o extension)
+DBNAME='galichet' # name of gw file input to gwc (w/o extension)
+ZIP_IMG='galichet_src_images.zip' # zip of images and src files for legacy DB
 BASES_DIR="$HOME/Genea/GeneWeb-Bases"
 DIST_DIR="./distribution"
 BIN_DIR="$DIST_DIR/gw"
 SUDOPRFX=   # something like 'sudo -u aSpecificId' if access fs required.
+GWCOPT='-v -f -cg'
 #=== hardcoded vars (end)   ===
 
 #===  main ====================
 cmd=$(basename $0)
-while getopts "f:h" Option
+cmddir=$(dirname $0)
+echo "starting $0 $@"
+while getopts "f:hr" Option
 do
 case $Option in
     f ) setenv_file=$OPTARG
@@ -35,6 +50,7 @@ case $Option in
             { echo "invalid -f $setenv_file  option file"; exit 1; }
         ;;
     h ) usage;;
+    r ) optreorg='-reorg';;
     * ) usage;;
 esac
 done
@@ -44,43 +60,65 @@ shift $(($OPTIND - 1))
 test -f "$setenv_file" && . $setenv_file
 
 if test ! -d $BASES_DIR/ ; then
-    echo "$BASES_DIR/ not accessible, change your default parms."
-    exit 1
+    mkdir -p $BASES_DIR
+    if test ! -d $BASES_DIR/ ; then
+        echo "$BASES_DIR/ not accessible, change your default parms."
+        exit 1
+    fi
 fi
-if test ! -f $BASES_DIR/$TESTGW.gw ; then
-    if test -f test/$TESTGW.gw ; then
-        cp -f  test/$TESTGW.gw $BASES_DIR/
+if test ! -f $BASES_DIR/$DBNAME.gw ; then
+    if test -f $cmddir/$DBNAME.gw ; then
+        cp -f  $cmddir/$DBNAME.gw $BASES_DIR/
     else
-        echo "$TESTGW.gw not found in $BASES_DIR or test/"
+        echo "$DBNAME.gw not found in $BASES_DIR or $cmddir/"
         exit 1
     fi
 else
-    if test "$TESTGW" = "$REFTESTGW"; then
-        rsync -a test/$TESTGW.gw $BASES_DIR/
+    if test "$DBNAME" = "$REFDBNAME"; then
+        rsync -a $cmddir/$DBNAME.gw $BASES_DIR/
     fi
 fi
 
-fqbindir=$(realpath $BIN_DIR)
+for xx in .lck .gwo .log .gwb _nouveau.gw .gwu_stderr _outdir; do
+    $SUDOPRFX rm -rf $BASES_DIR/${DBNAME}${xx}
+done
+for xx in .gwb _outdir; do
+    $SUDOPRFX mkdir $BASES_DIR/${DBNAME}${xx} || exit 1
+done
 
-cd $BASES_DIR
-$SUDOPRFX rm -rf $TESTGW.lck $TESTGW.gwo $TESTGW.log $TESTGW.gwb $TESTGW_nouveau.gw $TESTGW.gwu_stderr outdir.$TESTGW
-$SUDOPRFX mkdir outdir.$TESTGW $TESTGW.gwb $TESTGW.gwb/wiznotes || exit 1
-$SUDOPRFX $fqbindir/gwc -v -f -cg -o $TESTGW $TESTGW.gw >$TESTGW.log 2>&1 || \
-  { echo "gwc failure, details in $TESTGW.log"; exit 1; }
-$SUDOPRFX $fqbindir/gwu $TESTGW -v -o ${TESTGW}.gwu.o.gw 2>$TESTGW.gwu.o.stderr || \
-  { echo "gwu failure, details in $TESTGW.gwu.o.stderr"; exit 1; }
-$SUDOPRFX $fqbindir/gwu $TESTGW -v -o ${TESTGW}_nouveau.gw -odir outdir.$TESTGW 2>$TESTGW.gwu_stderr || \
-  { echo "gwu failure, details in $TESTGW.gwu_stderr"; exit 1; }
+gwcopt="$GWCOPT -bd $BASES_DIR $optreorg"
+$SUDOPRFX $BIN_DIR/gwc $gwcopt -o $DBNAME $BASES_DIR/$DBNAME.gw >$BASES_DIR/$DBNAME.log 2>&1 || \
+  { echo "gwc failure, details in $BASES_DIR/$DBNAME.log"; exit 1; }
+
+
+if test "$DBNAME" = "$REFDBNAME"; then
+    tmpdir="$BASES_DIR/unzip_tmp"
+    mkdir -p $tmpdir && rm -rf $tmpdir/*
+    unzip -q $cmddir/$ZIP_IMG -d $tmpdir
+    if test -n "$optreorg"; then
+        $SUDOPRFX mkdir -p $BASES_DIR/${DBNAME}.gwb/documents/portraits
+        $SUDOPRFX cp -Rp $tmpdir/src/$DBNAME/* $BASES_DIR/${DBNAME}.gwb/documents/
+        $SUDOPRFX cp -Rp $tmpdir/images/$DBNAME/* $BASES_DIR/${DBNAME}.gwb/documents/portraits/
+    else
+        $SUDOPRFX cp -Rp $tmpdir/* $BASES_DIR/
+    fi
+    rm -rf $tmpdir
+fi
+
+$SUDOPRFX $BIN_DIR/gwu $BASES_DIR/$DBNAME -v -o $BASES_DIR/${DBNAME}.gwu.o.gw 2>$BASES_DIR/$DBNAME.gwu.o.stderr || \
+  { echo "gwu failure, details in $BASES_DIR/$DBNAME.gwu.o.stderr"; exit 1; }
+$SUDOPRFX $BIN_DIR/gwu $BASES_DIR/$DBNAME -v -o $BASES_DIR/${DBNAME}_nouveau.gw -odir $BASES_DIR/outdir.$DBNAME 2>$BASES_DIR/$DBNAME.gwu_stderr || \
+  { echo "gwu failure, details in $BASES_DIR/$DBNAME.gwu_stderr"; exit 1; }
 
 RC=0
-for xx in "${TESTGW}.gwu.o.gw" "outdir.$TESTGW/$TESTGW.gw" ; do
-    if diff -q $TESTGW.gw $xx >/dev/null ; then
+for xx in "${DBNAME}.gwu.o.gw" "outdir.$DBNAME/$DBNAME.gw" ; do
+    if diff -q $BASES_DIR/$DBNAME.gw $BASES_DIR/$xx >/dev/null ; then
         : # nop
     else
-        if diff -qZ $TESTGW.gw $xx >/dev/null ; then
+        if diff -qZ $BASES_DIR/$DBNAME.gw $BASES_DIR/$xx >/dev/null ; then
             echo "Warning: trailing whitespace ignored"
         else
-            diff -u $TESTGW.gw $xx || RC=$(($RC+1))
+            diff -u $BASES_DIR/$DBNAME.gw $BASES_DIR/$xx || RC=$(($RC+1))
         fi
     fi
 done

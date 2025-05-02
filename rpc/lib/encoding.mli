@@ -26,8 +26,9 @@ val enum : name:string -> ('a * string) list -> 'a t
 
     The [name] string is used for printing.
 
-    The underlying encoding will raise {exception:Failwith} if it is called
-    on a constructor of type ['a] that is not present in [l]. *)
+    The underlying encoding will
+    @raise Failwith if it is called on a constructor of type ['a]
+    that is not present in [l]. *)
 
 val generic :
   to_json:('a -> Yojson.Safe.t) ->

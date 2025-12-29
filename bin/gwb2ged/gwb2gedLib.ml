@@ -223,7 +223,7 @@ let ged_header opts base ifile ofile =
   | Gwexport.Ansi -> Printf.ksprintf (oc opts) "1 CHAR ANSI\n"
   | Gwexport.Ascii -> Printf.ksprintf (oc opts) "1 CHAR ASCII\n"
   | Gwexport.Utf8 -> Printf.ksprintf (oc opts) "1 CHAR UTF-8\n");
-  if opts.Gwexport.no_notes = `none then
+  if opts.Gwexport.base_notes then
     match Driver.base_notes_read base "" with
     | "" -> ()
     | s -> display_note opts 1 s
@@ -349,7 +349,7 @@ let ged_ev_detail opts n typ d pl note src =
       Printf.ksprintf (oc opts) "\n"
   | None -> ());
   if pl <> "" then Printf.ksprintf (oc opts) "%d PLAC %s\n" n (encode opts pl);
-  if opts.Gwexport.no_notes <> `nnn && note <> "" then display_note opts n note;
+  if opts.Gwexport.notes && note <> "" then display_note opts n note;
   if opts.Gwexport.source = None && src <> "" then
     print_sour opts n (encode opts src)
 
@@ -586,7 +586,7 @@ let ged_multimedia_link opts base per =
         Printf.ksprintf (oc opts) "2 FILE %s\n" s)
 
 let ged_note opts base per =
-  if opts.Gwexport.no_notes <> `nnn then
+  if opts.Gwexport.notes then
     match Driver.sou base (Driver.get_notes per) with
     | "" -> ()
     | s -> display_note opts 1 s
@@ -651,7 +651,7 @@ let ged_fsource opts base fam =
       | s -> print_sour opts 1 (encode opts s))
 
 let ged_comment opts base fam =
-  if opts.Gwexport.no_notes <> `nnn then
+  if opts.Gwexport.notes then
     match Driver.sou base (Driver.get_comment fam) with
     | "" -> ()
     | s -> display_note opts 1 s

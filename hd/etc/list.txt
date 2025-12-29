@@ -153,7 +153,7 @@
       %end;
       %if;(e.data="place")<a href="%prefix;m=PPS&k=%k;%opt;" title="[place/places]0/[surname/surnames]0">%k;</a>%end;
     %sp;(%end;
-    %e.nb; %if;(e.nb>1)[person/persons]1%else;[person/persons]0%end;,
+    %if;(e.nb!="")%e.nb; %if;(e.nb>1)[person/persons]1%else;[person/persons]0%end;, %end;
       %if;(e.datesort=1)[date/dates]1%else;[sort by/branch/alphabetic order]2%end;
     %if;(k!="" and e.data!="fna" and e.data!="sna"))%end;
   </div>

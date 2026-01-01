@@ -816,7 +816,7 @@ let error conf str =
   trailer conf
 
 let exec_f comm =
-  let s = comm ^ " > " ^ "comm.log" in
+  let s = comm ^ " > " ^ "comm.log 2>&1" in
   Printf.eprintf "$ cd \"%s\"\n" (Sys.getcwd ());
   flush stderr;
   Printf.eprintf "$ %s\n" s;
@@ -977,7 +977,7 @@ let cache_files_check conf =
 let cache_files ok_file conf =
   let rc =
     let comm = stringify (Filename.concat !bin_dir "cache_files") ^ " " in
-    exec_f (comm ^ parameters conf.env ^ " > comm.log")
+    exec_f (comm ^ parameters conf.env ^ " > comm.log 2>&1")
   in
   flush stderr;
   if rc > 1 then print_file conf "err_standard\n  .htm"
@@ -1198,7 +1198,7 @@ let recover_2 conf =
       Sys.chdir dir;
       let c =
         Filename.concat !bin_dir src_to_new
-        ^ " " ^ tmp ^ " -f -o " ^ out_file ^ " > " ^ "comm.log"
+        ^ " " ^ tmp ^ " -f -o " ^ out_file ^ " > " ^ "comm.log 2>&1"
       in
       Printf.eprintf "$ %s\n" c;
       flush stderr;

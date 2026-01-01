@@ -84,37 +84,38 @@ main() {
     local SCRIPT_DIR
     SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
     local BASES_DIR="$SCRIPT_DIR/bases"
-    
+    local GW_DIR="$SCRIPT_DIR/gw"
+
     export LANG=$(detect_language)
-    
+
     # Stop any running instances
     kill_process '/gwd'
     kill_process '/gwsetup'
-    
+
     # Prepare directories and logs
     mkdir -p "$BASES_DIR"
     cd "$BASES_DIR"
     rotate_log "gwsetup.log"
-    rotate_log "gwd.log"
-    
+    rotate_log "$GW_DIR/gwd.log"
+
     # Start gwsetup
     msg "start_gwsetup"
-    "$SCRIPT_DIR/gw/gwsetup" -gd "$SCRIPT_DIR/gw" -lang "$LANG" > gwsetup.log 2>&1 &
+    "$GW_DIR/gwsetup" -gd "$GW_DIR" -lang "$LANG" > "gwsetup.log" 2>&1 &
     check_process '/gwsetup' "gwsetup"
-    
+
     # Start gwd
     msg "start_gwd"
-    "$SCRIPT_DIR/gw/gwd" -hd "$SCRIPT_DIR/gw" > "$SCRIPT_DIR/gw/gwd.log" 2>&1 &
+    "$GW_DIR/gwd" -hd "$GW_DIR" -bd "$BASES_DIR" > "$GW_DIR/gwd.log" 2>&1 &
     check_process '/gwd' "gwd"
-    
+
     # Success message
     echo
     msg "keep_open"
-    
+
     # Open browser and minimize terminal
     open "$SCRIPT_DIR/START.htm"
     osascript -e 'tell application "Terminal" to set miniaturized of first window whose name contains "GeneWeb" to true' 2>/dev/null || true
-    
+
     # Keep script running
     cat
 }

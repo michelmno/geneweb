@@ -11,9 +11,8 @@ type gwexport_opts = {
   keys : string list; (* Key reference of additional persons to select *)
   aws : bool; (* Export also siblings of exported persons *)
   mem : bool; (* Unused by this module *)
-  no_notes : [ `nn | `nnn | `none ];
-      (* Unused by this module
-         S: Consider simple ADTs *)
+  notes : bool; (* true if we export notes *)
+  base_notes : bool; (* true if we export base_notes *)
   no_picture : bool; (* Unused by this module *)
   oc : string * (string -> unit) * (unit -> unit); (* Unused by this module *)
   parentship : bool;
